@@ -444,8 +444,62 @@
     transform: translateY(0) scale(1);
   }
 }
+@keyframes hud-tab-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(0.99);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+@keyframes hud-tab-slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-28px) scale(0.99);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
 @utility animate-tab-panel {
   animation: hud-tab-panel-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  &[data-dir="next"] {
+    animation-name: hud-tab-slide-next;
+    animation-duration: 0.45s;
+  }
+  &[data-dir="prev"] {
+    animation-name: hud-tab-slide-prev;
+    animation-duration: 0.45s;
+  }
+}
+@keyframes hud-tab-pop {
+  0% {
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.portfolio-shell .tab-pill[data-active="true"] {
+  animation: hud-tab-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-shell *,
+  .portfolio-shell *::before,
+  .portfolio-shell *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Lightweight page-wide motion: no JavaScript animation loops or layout animation. */
