@@ -1,0 +1,535 @@
+/*
+ * Tailwind v4 entry: config lives here, with no tailwind.config.js or PostCSS plugin.
+ * Web fonts are loaded at runtime via <link> (see ThemeStyle); never @import remote URLs.
+ */
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Tactical HUD design system.
+ * Static defaults live here (oklch). The CMS theme editor overrides the same
+ * variables at runtime through an injected <style> tag (ThemeStyle).
+ */
+
+@theme inline {
+  --font-sans: var(--app-font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--app-font-mono), ui-monospace, "SFMono-Regular", monospace;
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-online: var(--online);
+  --color-signal: var(--signal);
+  --color-signal-foreground: var(--signal-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--primary);
+  --color-chart-2: var(--signal);
+  --color-chart-3: var(--muted-foreground);
+  --color-chart-4: var(--foreground);
+  --color-chart-5: var(--border);
+  --color-sidebar: var(--card);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-primary: var(--primary);
+  --color-sidebar-primary-foreground: var(--primary-foreground);
+  --color-sidebar-accent: var(--accent);
+  --color-sidebar-accent-foreground: var(--foreground);
+  --color-sidebar-border: var(--border);
+  --color-sidebar-ring: var(--ring);
+}
+
+:root {
+  --app-font-sans: "Geist";
+  --app-font-mono: "JetBrains Mono";
+  --radius: 6px;
+  --card-bw: 1px;
+  --background: oklch(0.13 0.008 160);
+  --foreground: oklch(0.94 0.015 155);
+  --surface: oklch(0.17 0.01 160);
+  --card: oklch(0.185 0.011 160);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.9 0.21 135);
+  --primary-foreground: oklch(0.16 0.02 150);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface);
+  --muted-foreground: oklch(0.62 0.02 160);
+  --accent: oklch(0.22 0.014 160);
+  --accent-foreground: var(--foreground);
+  --signal: oklch(0.8 0.16 75);
+  --signal-foreground: oklch(0.18 0.03 70);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.27 0.016 160);
+  --input: var(--border);
+  --ring: var(--primary);
+  --online: oklch(0.72 0.19 150);
+  --glow: color-mix(in oklab, var(--primary) 35%, transparent);
+  --grid-line: color-mix(in oklab, var(--foreground) 5%, transparent);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 40%, transparent);
+    color: var(--foreground);
+  }
+  :focus-visible {
+    outline: 1px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------- HUD primitives ---------- */
+
+@utility hud-card {
+  position: relative;
+  --card-rest-shadow: var(--shadow, 0 12px 30px -22px color-mix(in oklab, var(--foreground) 42%, transparent));
+  background-color: color-mix(in oklab, var(--card) var(--card-alpha, 100%), transparent);
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--foreground) 4%, transparent) 0%,
+    transparent 48%,
+    color-mix(in oklab, var(--primary) 3%, transparent) 100%
+  );
+  border: var(--card-bw) solid color-mix(in oklab, var(--border) 80%, transparent);
+  border-radius: var(--radius);
+  box-shadow: var(--card-rest-shadow), inset 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent);
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Frosted glass only on larger screens; phones get a near-solid card (no blur cost). */
+  @media (min-width: 768px) {
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+  @media (max-width: 767px) {
+    background-color: color-mix(in oklab, var(--card) 92%, transparent);
+  }
+}
+
+/* Static ambient backdrop: plain grid, painted once (no animation). */
+@utility glass-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--background);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size:
+    32px 32px,
+    32px 32px;
+}
+
+/* Corner brackets for tactical framing */
+@utility hud-corners {
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    border-color: var(--primary);
+    opacity: 0;
+  }
+  :where(html[data-hud-corners]) &::before,
+  :where(html[data-hud-corners]) &::after {
+    opacity: 0.7;
+  }
+  &::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    border-top-left-radius: var(--radius);
+  }
+  &::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    border-bottom-right-radius: var(--radius);
+  }
+}
+
+@utility hud-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+@utility hud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
+  color: var(--muted-foreground);
+}
+
+@utility hud-badge-primary {
+  border-color: color-mix(in oklab, var(--primary) 45%, transparent);
+  color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+}
+
+@utility hud-badge-signal {
+  border-color: color-mix(in oklab, var(--signal) 45%, transparent);
+  color: var(--signal);
+  background: color-mix(in oklab, var(--signal) 10%, transparent);
+}
+
+@utility hud-glow {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 40%, transparent), 0 0 24px -6px var(--glow);
+}
+
+@utility hud-gridbg {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@utility status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 25%, transparent);
+  animation: hud-pulse 1.8s ease-in-out infinite;
+}
+
+@utility progress-track {
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--surface);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+@utility progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--signal));
+  transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@utility blink-cursor {
+  &::after {
+    content: "_";
+    color: var(--primary);
+    animation: hud-blink 1s steps(1) infinite;
+    margin-left: 0.05em;
+  }
+}
+
+@utility glitch-hover {
+  &:hover {
+    animation: hud-glitch 0.35s steps(2) 2;
+    text-shadow:
+      2px 0 color-mix(in oklab, red 70%, transparent),
+      -2px 0 color-mix(in oklab, cyan 70%, transparent);
+  }
+}
+
+@utility no-select {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@utility block-cursor {
+  cursor:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='20'><rect width='12' height='20' fill='%238dff5a' fill-opacity='0.85'/></svg>") 0 0,
+    auto;
+  & a,
+  & button,
+  & [role="button"],
+  & [role="tab"] {
+    cursor:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='20'><rect width='12' height='20' fill='%23ffb020' fill-opacity='0.9'/></svg>") 0 0,
+      pointer;
+  }
+}
+
+@utility scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    color-mix(in oklab, black 22%, transparent) 2px 3px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Blueprint grid banner that fades into the card */
+@utility banner-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--primary) 22%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--primary) 22%, transparent) 1px, transparent 1px);
+  background-size: 21px 21px;
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+
+@utility tab-pill {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.45rem 0.5rem;
+  border-radius: calc(var(--radius) + 2px);
+  color: var(--foreground);
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklab, var(--surface) 88%, var(--foreground) 3%),
+    color-mix(in oklab, var(--surface) 82%, transparent)
+  );
+  box-shadow:
+    0 2px 5px color-mix(in oklab, var(--background) 38%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent);
+  opacity: 0.85;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  &:hover {
+    color: var(--foreground);
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--accent) 92%, var(--foreground) 4%),
+      var(--accent)
+    );
+    box-shadow:
+      0 4px 10px color-mix(in oklab, var(--background) 45%, transparent),
+      inset 0 1px 0 color-mix(in oklab, var(--foreground) 7%, transparent);
+    transform: translateY(-1px);
+  }
+  &[data-active="true"] {
+    opacity: 1;
+    color: var(--primary-foreground);
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--primary) 88%, var(--signal) 12%),
+      var(--primary)
+    );
+    border-color: color-mix(in oklab, var(--primary) 80%, var(--foreground) 20%);
+    box-shadow:
+      0 4px 12px color-mix(in oklab, var(--primary) 20%, transparent),
+      inset 0 1px 0 color-mix(in oklab, var(--primary-foreground) 18%, transparent);
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes hud-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes hud-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes hud-glitch {
+  0% {
+    transform: translate(0);
+  }
+  50% {
+    transform: translate(-1px, 1px);
+  }
+  100% {
+    transform: translate(1px, -1px);
+  }
+}
+@keyframes hud-drop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@utility animate-drop {
+  animation: hud-drop 0.18s ease-out;
+}
+@keyframes hud-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@utility animate-fade-up {
+  animation: hud-fade-up 0.3s ease-out both;
+}
+
+/* Tab changes use only compositor-friendly opacity and transforms. */
+@keyframes hud-tab-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@utility animate-tab-panel {
+  animation: hud-tab-panel-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Lightweight page-wide motion: no JavaScript animation loops or layout animation. */
+@keyframes hud-shell-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes hud-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.portfolio-shell > main > header {
+  animation: hud-shell-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.portfolio-shell nav[role="tablist"] {
+  animation: hud-shell-enter 0.45s 0.08s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.portfolio-shell [role="tabpanel"] .hud-card {
+  animation: hud-card-enter 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.portfolio-shell [role="tabpanel"] .hud-card:nth-child(2) { animation-delay: 0.04s; }
+.portfolio-shell [role="tabpanel"] .hud-card:nth-child(3) { animation-delay: 0.08s; }
+.portfolio-shell [role="tabpanel"] .hud-card:nth-child(4) { animation-delay: 0.12s; }
+.portfolio-shell [role="tabpanel"] .hud-card:nth-child(5) { animation-delay: 0.16s; }
+.portfolio-shell [role="tabpanel"] .hud-card:nth-child(n + 6) { animation-delay: 0.2s; }
+.portfolio-shell :where(button, [role="button"], a.hud-card) {
+  transition-property: color, background, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 0.22s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.portfolio-shell :where(button, [role="button"]):active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+}
+.portfolio-shell [role="tabpanel"] .group > img {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes hud-contact-arrival {
+  0%,
+  100% {
+    box-shadow: var(--card-rest-shadow);
+  }
+  35% {
+    border-color: color-mix(in oklab, var(--primary) 55%, var(--border));
+    box-shadow:
+      var(--card-rest-shadow),
+      0 0 0 3px color-mix(in oklab, var(--primary) 16%, transparent),
+      0 14px 30px -20px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+}
+.portfolio-shell [role="tabpanel"].contact-arrival .hud-card {
+  animation: hud-contact-arrival 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .portfolio-shell [role="tabpanel"] .hud-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+    box-shadow:
+      var(--card-rest-shadow),
+      0 12px 28px -18px color-mix(in oklab, var(--primary) 45%, transparent);
+  }
+  .portfolio-shell [role="tabpanel"] .group:hover > img {
+    transform: scale(1.025);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
