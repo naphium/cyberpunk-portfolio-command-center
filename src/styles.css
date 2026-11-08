@@ -493,15 +493,6 @@
 .portfolio-shell .tab-pill[data-active="true"] {
   animation: hud-tab-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
-@media (prefers-reduced-motion: reduce) {
-  .portfolio-shell *,
-  .portfolio-shell *::before,
-  .portfolio-shell *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
 /* Lightweight page-wide motion: no JavaScript animation loops or layout animation. */
 @keyframes hud-shell-enter {
   from {
@@ -578,12 +569,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
