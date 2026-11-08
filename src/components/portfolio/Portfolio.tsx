@@ -92,6 +92,11 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [matrix, setMatrix] = useState(false);
   const [contactArrival, setContactArrival] = useState(false);
+  const [dir, setDir] = useState<"next" | "prev">("next");
+  const activeRef = useRef<string>(active);
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
   const navRef = useRef<HTMLDivElement>(null);
   const audio = useAudio();
 
@@ -119,6 +124,10 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
   const goTab = useCallback(
     (id: string, scrollToNav = true) => {
       if (!tabs.some((t) => t.id === id)) return;
+      const from = tabs.findIndex((t) => t.id === activeRef.current);
+      const to = tabs.findIndex((t) => t.id === id);
+      setDir(to >= from ? "next" : "prev");
+      activeRef.current = id;
       setActive(id as TabId);
       localStorage.setItem(TAB_KEY, id);
       history.replaceState(null, "", `#${id}`);
@@ -135,13 +144,29 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
 
   useEffect(() => {
     if (!contactArrival || active !== "links") return;
+    let raf = 0;
     const frame = requestAnimationFrame(() => {
+      const el = document.getElementById("links-content");
+      if (!el) return;
+      const target = Math.max(0, el.getBoundingClientRect().top + window.scrollY - 80);
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      document.getElementById("links-content")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      if (reduceMotion) return window.scrollTo(0, target);
+      const start = window.scrollY;
+      const dist = target - start;
+      const dur = Math.min(1100, 500 + Math.abs(dist) * 0.4);
+      const t0 = performance.now();
+      const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / dur);
+        window.scrollTo(0, start + dist * ease(p));
+        if (p < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
     });
-    const timeout = window.setTimeout(() => setContactArrival(false), 1100);
+    const timeout = window.setTimeout(() => setContactArrival(false), 1600);
     return () => {
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(raf);
       window.clearTimeout(timeout);
     };
   }, [active, contactArrival]);
@@ -286,6 +311,7 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
             key={active}
             id={`${active}-content`}
             role="tabpanel"
+            data-dir={dir}
             className={`animate-tab-panel min-h-[50vh] scroll-mt-20 ${active === "links" && contactArrival ? "contact-arrival" : ""}`}
           >
             {renderSection(active, data)}
