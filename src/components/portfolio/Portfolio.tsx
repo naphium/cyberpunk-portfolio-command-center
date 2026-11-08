@@ -149,8 +149,6 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
       const el = document.getElementById("links-content");
       if (!el) return;
       const target = Math.max(0, el.getBoundingClientRect().top + window.scrollY - 80);
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (reduceMotion) return window.scrollTo(0, target);
       const start = window.scrollY;
       const dist = target - start;
       const dur = Math.min(1100, 500 + Math.abs(dist) * 0.4);
