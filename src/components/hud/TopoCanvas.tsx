@@ -13,7 +13,6 @@ export function TopoCanvas({ className = "" }: { className?: string }) {
     const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const lowSpec = (navigator.hardwareConcurrency ?? 4) <= 4;
     const dpr = Math.min(window.devicePixelRatio || 1, lowSpec ? 1 : 1.5);
     const cache = document.createElement("canvas");
@@ -145,7 +144,7 @@ export function TopoCanvas({ className = "" }: { className?: string }) {
     };
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVis);
-    if (!reduced) raf = requestAnimationFrame(loop);
+    raf = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(raf);
