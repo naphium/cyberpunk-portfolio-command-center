@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { uid, TAB_LABELS, type SiteData, type ThemeColors } from "@/lib/content";
 import { FONT_OPTIONS } from "@/lib/fonts";
+import { INTERACTION_EGGS, EASTER_EGGS } from "@/lib/easter-eggs";
 import { PRESETS } from "@/components/hud/ThemeStyle";
 import { deleteGuestbookEntry } from "@/lib/content.functions";
 import { Button } from "@/components/ui/button";
@@ -277,16 +278,24 @@ function SettingsEditor({ draft, set }: EP) {
           onChange={(v) => upd({ effects: v })}
           fields={[
             { key: "background", label: "Topographic canvas", type: "switch" },
+            { key: "reducedMotion", label: "Reduced motion (owner controlled)", type: "switch" },
+            { key: "easterEggs", label: "Secret interactions", type: "switch" },
             { key: "scanlines", label: "CRT scanlines", type: "switch" },
             { key: "blinkCursor", label: "Blinking name cursor", type: "switch" },
             { key: "glitch", label: "RGB glitch on hover", type: "switch" },
             { key: "customCursor", label: "Green block cursor", type: "switch" },
             { key: "fpsCounter", label: "FPS / hardware HUD", type: "switch" },
             { key: "consoleBanner", label: "DevTools console banner", type: "switch" },
-            { key: "konami", label: "Konami code matrix", type: "switch" },
+            { key: "konami", label: "Konami arcade", type: "switch" },
             { key: "matrixGlyphs", label: "Matrix glyphs", type: "select", options: ["katakana", "binary", "mixed"] },
           ]}
         />
+      </EditorCard>
+      <EditorCard title="Easter egg reference">
+        <div className="divide-y">
+          {INTERACTION_EGGS.map((egg) => <div key={egg.name} className="py-3"><p className="text-sm font-medium">{egg.name}</p><p className="text-xs text-muted-foreground">{egg.trigger}</p></div>)}
+          {EASTER_EGGS.map((egg) => <div key={egg.command} className="py-2 text-xs"><code className="text-primary">{egg.command}</code> · {egg.name} — {egg.hint}</div>)}
+        </div>
       </EditorCard>
       <EditorCard title="Terminal">
         <ObjectFields

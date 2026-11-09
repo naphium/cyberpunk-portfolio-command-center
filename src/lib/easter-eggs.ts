@@ -1,3 +1,23 @@
+export const INTERACTION_EGGS = [
+  { name: "Matrix mode", trigger: "Type matrix outside a text field; repeat to exit." },
+  { name: "Avatar combo", trigger: "Click or tap the avatar 5 times within 2 seconds." },
+  { name: "Inspector command", trigger: "Run window.hireMe() in the browser console." },
+  { name: "Retro arcade", trigger: "↑ ↑ ↓ ↓ ← → ← → B A; click the arcade coin to score." },
+  { name: "Coffee boost", trigger: "Drag the Coffee badge onto the avatar, or select Coffee then tap the avatar." },
+  { name: "Dev notes", trigger: "Hold the profile name for 3 seconds, or focus it and hold Space." },
+  { name: "Gravity", trigger: "Double-click [x] gravity in the footer; Reset Site restores everything." },
+] as const;
+
+export function advanceSequence(buffer: string, key: string) {
+  const next = (buffer + key.toLowerCase()).slice(-6);
+  return { buffer: next === "matrix" ? "" : next, triggered: next === "matrix" };
+}
+
+export function avatarCombo(times: number[], now: number) {
+  const recent = [...times.filter((time) => now - time <= 2000), now];
+  return { times: recent.length >= 5 ? [] : recent, triggered: recent.length >= 5 };
+}
+
 export const EASTER_EGGS = [
   { command: "hello", name: "Secret handshake", hint: "A personal greeting from the node." },
   { command: "coffee", name: "Coffee machine", hint: "Brew a virtual cup." },

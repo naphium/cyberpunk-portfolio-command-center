@@ -31,6 +31,8 @@ use the editor.
 
 ## Project rules
 
+- Secret interactions are isolated in the portfolio EasterEggs module; physics loads only on activation and restores DOM styles on reset or unmount. Why: keep normal navigation lightweight and reversible.
+
 - All portfolio content, settings and theme live in one JSON row (`site_content`, id `main`); always read it through `mergeData()` in `src/lib/content.ts` so older documents stay compatible. Why: single source of truth with backwards-compatible schema growth.
 - Admin auth is a shared password (`ADMIN_PASSWORD`) checked in server functions; success returns an HMAC token (`ADMIN_SESSION_SECRET`) the client sends with every admin call — not cookies. Why: the editor preview runs in a cross-site iframe where third-party cookies are blocked.
 - Content writes and media uploads go only through server functions in `src/lib/content.functions.ts` using the admin client after token verification; the table has public read-only RLS. Why: visitors must never be able to write content.

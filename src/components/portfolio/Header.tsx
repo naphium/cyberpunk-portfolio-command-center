@@ -166,7 +166,7 @@ export function Header({ data, mode, onToggleTheme, onContacts }: Props) {
       </div>
 
       <div className="flex flex-col items-center gap-3 px-4 pb-7 text-center sm:px-8">
-        <div className="relative -mt-16 shrink-0 sm:-mt-20">
+        <div id="avatar" role="button" tabIndex={0} aria-label="Profile avatar" className="relative -mt-16 shrink-0 cursor-pointer sm:-mt-20">
           {p.avatarUrl ? (
             <img
               src={p.avatarUrl}
@@ -182,7 +182,7 @@ export function Header({ data, mode, onToggleTheme, onContacts }: Props) {
         </div>
 
         <div className="w-full min-w-0 space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">{p.name}</h1>
+          <h1 id="profile-title" tabIndex={0} className="text-3xl font-bold tracking-tight sm:text-5xl">{p.name}</h1>
           <p className="font-mono text-[11px] text-muted-foreground sm:text-xs">
             {nick && `(${nick}) · `}@{p.handle}
           </p>

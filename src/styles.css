@@ -91,6 +91,10 @@
   --online: oklch(0.72 0.19 150);
   --glow: color-mix(in oklab, var(--primary) 35%, transparent);
   --grid-line: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --matrix-code: #39ff78;
+  --matrix-dark: #030b06;
+  --matrix-trail: rgba(3, 11, 6, 0.08);
+  --matrix-surface: #0a180e;
 }
 
 @layer base {
@@ -568,4 +572,18 @@
     transform: scale(1.025);
   }
 }
+
+html[data-matrix] { --background: var(--matrix-dark); --card: var(--matrix-surface); --surface: var(--matrix-surface); --primary: var(--matrix-code); --foreground: var(--matrix-code); --card-foreground: var(--matrix-code); --primary-foreground: var(--matrix-dark); }
+.matrix-backdrop { background: var(--matrix-dark); opacity: 0.6; }
+#avatar { touch-action: manipulation; }
+#avatar.avatar-coffee { box-shadow: 0 0 30px var(--signal); border-radius: 50%; }
+#avatar.avatar-party > :first-child { animation: egg-spin 0.8s ease-in-out; }
+#avatar.avatar-party::after { content: "▀▀█▀▀"; position: absolute; left: 50%; top: 38%; transform: translateX(-50%); color: var(--matrix-dark); background: var(--foreground); font: bold 24px monospace; }
+#avatar.avatar-party::before { content: "✦ · ✧ ★ ✦ · ✧"; position: absolute; inset: -20px; color: var(--signal); font-size: 24px; text-align: center; animation: egg-confetti 1s ease-out both; pointer-events: none; }
+.egg-charging { background-image: linear-gradient(var(--primary), var(--primary)); background-repeat: no-repeat; background-position: bottom left; background-size: 0% 3px; animation: egg-charge 3s linear forwards; user-select: none; touch-action: none; }
+@keyframes egg-spin { to { transform: rotate(360deg); } }
+@keyframes egg-confetti { from { transform: scale(0.6); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
+@keyframes egg-charge { to { background-size: 100% 3px; } }
+html[data-owner-reduced-motion] { scroll-behavior: auto; }
+html[data-owner-reduced-motion] *, html[data-owner-reduced-motion] *::before, html[data-owner-reduced-motion] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 

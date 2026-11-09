@@ -2,12 +2,14 @@ import { useEffect, useRef } from "react";
 
 const KATAKANA = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
 
-export function MatrixRain({ glyphs, onClose }: { glyphs: "katakana" | "binary" | "mixed"; onClose: () => void }) {
+export function MatrixRain({ glyphs, onClose, background = false }: { glyphs: "katakana" | "binary" | "mixed"; onClose: () => void; background?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = ref.current!;
-    const ctx = canvas.getContext("2d")!;
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     const chars =
       glyphs === "binary" ? "01" : glyphs === "mixed" ? KATAKANA + "0123456789ABCDEF" : KATAKANA;
     const size = 16;
@@ -20,14 +22,15 @@ export function MatrixRain({ glyphs, onClose }: { glyphs: "katakana" | "binary" 
       drops = Array.from({ length: cols }, () => Math.random() * -50);
     };
     resize();
-    const primary = getComputedStyle(document.documentElement).getPropertyValue("--primary").trim() || "#8dff5a";
+    const tokens = getComputedStyle(document.documentElement);
+    const primary = tokens.getPropertyValue("--matrix-code").trim();
     let raf = 0;
     let last = 0;
     const draw = (now: number) => {
       raf = requestAnimationFrame(draw);
       if (now - last < 40) return;
       last = now;
-      ctx.fillStyle = "rgba(0,0,0,0.08)";
+      ctx.fillStyle = tokens.getPropertyValue("--matrix-trail").trim();
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = primary;
       ctx.font = `${size}px monospace`;
@@ -42,21 +45,21 @@ export function MatrixRain({ glyphs, onClose }: { glyphs: "katakana" | "binary" 
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     window.addEventListener("resize", resize);
-    const timer = setTimeout(onClose, 15000);
+    const timer = background ? undefined : setTimeout(onClose, 15000);
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(timer);
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", resize);
     };
-  }, [glyphs, onClose]);
+  }, [glyphs, onClose, background]);
 
   return (
-    <div className="fixed inset-0 z-[90] bg-background" onClick={onClose} role="presentation">
+    <div className={background ? "pointer-events-none fixed inset-0 z-[1] matrix-backdrop" : "fixed inset-0 z-[90] bg-background"} onClick={background ? undefined : onClose} role="presentation">
       <canvas ref={ref} className="h-full w-full" />
-      <div className="hud-badge hud-badge-primary absolute bottom-4 left-1/2 -translate-x-1/2">
+      {!background && <div className="hud-badge hud-badge-primary absolute bottom-4 left-1/2 -translate-x-1/2">
         wake up, neo · click or esc to exit
-      </div>
+      </div>}
     </div>
   );
 }
