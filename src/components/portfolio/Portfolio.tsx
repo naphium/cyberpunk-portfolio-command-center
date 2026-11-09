@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Megaphone, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import type { SiteData, TabId } from "@/lib/content";
@@ -9,7 +9,7 @@ import { MatrixRain } from "@/components/hud/MatrixRain";
 import { Terminal } from "@/components/hud/Terminal";
 import { CommandPalette } from "@/components/hud/CommandPalette";
 import { AudioProvider, useAudio } from "@/components/hud/AudioProvider";
-import { ReadingProgress, useGlobalBehaviors, useKonami } from "@/components/hud/Effects";
+import { ReadingProgress, useGlobalBehaviors } from "@/components/hud/Effects";
 import { Header } from "./Header";
 import {
   AboutSection,
@@ -32,6 +32,7 @@ import {
 import { AudioSection, GuestbookSection } from "./sections-interactive";
 
 const TAB_KEY = "hud-tab";
+const EasterEggs = lazy(() => import("@/components/hud/EasterEggs").then((module) => ({ default: module.EasterEggs })));
 
 function renderSection(id: TabId, data: SiteData): ReactNode {
   switch (id) {
@@ -85,7 +86,7 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
   const s = data.settings;
   const fx = s.effects;
   const { mode, setMode, toggleMode: toggle } = useThemeMode(data.theme, !preview);
-  const backdrop = mode === "dark" && fx.background ? <TopoCanvas /> : <div className="glass-backdrop" aria-hidden />;
+  const backdrop = mode === "dark" && fx.background && !fx.reducedMotion ? <TopoCanvas /> : <div className="glass-backdrop" aria-hidden />;
   const tabs = useMemo(() => data.tabs.filter((t) => t.visible), [data.tabs]);
   const [active, setActive] = useState<TabId>(tabs[0]?.id ?? "about");
   const [termOpen, setTermOpen] = useState(false);
@@ -101,6 +102,10 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
   const audio = useAudio();
 
   useGlobalBehaviors(data, !preview);
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-owner-reduced-motion", fx.reducedMotion);
+    return () => document.documentElement.removeAttribute("data-owner-reduced-motion");
+  }, [fx.reducedMotion]);
 
   // restore tab from hash or memory
   useEffect(() => {
@@ -133,13 +138,13 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
       history.replaceState(null, "", `#${id}`);
       const top = navRef.current?.getBoundingClientRect().top ?? 0;
       if (scrollToNav && (top < 0 || top > window.innerHeight * 0.6)) {
-        navRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        navRef.current?.scrollIntoView({ behavior: fx.reducedMotion ? "instant" : "smooth", block: "start" });
       }
       if (scrollToNav) {
-        document.getElementById(`tab-${id}`)?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        document.getElementById(`tab-${id}`)?.scrollIntoView({ behavior: fx.reducedMotion ? "instant" : "smooth", block: "nearest", inline: "center" });
       }
     },
-    [tabs],
+    [tabs, fx.reducedMotion],
   );
 
   useEffect(() => {
@@ -149,6 +154,7 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
       const el = document.getElementById("links-content");
       if (!el) return;
       const target = Math.max(0, el.getBoundingClientRect().top + window.scrollY - 80);
+      if (fx.reducedMotion) { window.scrollTo({ top: target, behavior: "instant" }); return; }
       const start = window.scrollY;
       const dist = target - start;
       const dur = Math.min(1100, 500 + Math.abs(dist) * 0.4);
@@ -167,7 +173,7 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
       cancelAnimationFrame(raf);
       window.clearTimeout(timeout);
     };
-  }, [active, contactArrival]);
+  }, [active, contactArrival, fx.reducedMotion]);
 
   const copyLink = useCallback(async () => {
     try {
@@ -205,7 +211,6 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
 
   const startMatrix = useCallback(() => setMatrix(true), []);
   const stopMatrix = useCallback(() => setMatrix(false), []);
-  useKonami(fx.konami, startMatrix);
 
   if (s.maintenance.enabled && !preview) {
     return (
@@ -317,6 +322,7 @@ function PortfolioInner({ data, preview }: { data: SiteData; preview: boolean })
 
           <footer className="border-t pt-4 text-center font-mono text-xs text-muted-foreground">
             © {data.profile.name} · {data.profile.location}
+            {fx.easterEggs && <Suspense fallback={null}><EasterEggs data={data} active={active} /></Suspense>}
           </footer>
         </main>
       </div>
