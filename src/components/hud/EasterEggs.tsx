@@ -102,11 +102,10 @@ export function EasterEggs({ data, active }: { data: SiteData; active: string })
   }, []);
 
   useEffect(() => {
-    if (!fx.consoleBanner) return;
     const w = window as Window & { hireMe?: () => void };
     const previous = w.hireMe;
     w.hireMe = () => console.table({ Name: data.profile.name, Email: data.profile.email, Skills: data.skills.groups.flatMap((group) => group.items).sort((a, b) => b.level - a.level).slice(0, 5).map((skill) => skill.name).join(", "), Resume: data.links.find((link) => /resume|résumé|cv/i.test(link.title))?.url || "Not supplied" });
-    console.info("Curious developer? Run window.hireMe() for a contact card.");
+    if (fx.consoleBanner) console.info("Curious developer? Run window.hireMe() for a contact card.");
     return () => { if (previous) w.hireMe = previous; else delete w.hireMe; };
   }, [data.profile, data.skills, data.links, fx.consoleBanner]);
 
