@@ -1,5 +1,7 @@
 # Tasks
 
+- [ ] Integrate and verify the seven Easter eggs from the uploaded brief, with an owner reference list.
+
 - [ ] Add owner-controlled reduced motion in Settings & FX.
 - [ ] Expand social fetching and embed providers.
 - [ ] Add Spotify public profile, playlists and embedded listening.

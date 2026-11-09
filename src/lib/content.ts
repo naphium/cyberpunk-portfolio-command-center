@@ -82,6 +82,8 @@ export interface Settings {
   disableRightClick: boolean;
   disableSelection: boolean;
   effects: {
+    reducedMotion: boolean;
+    easterEggs: boolean;
     background: boolean;
     scanlines: boolean;
     blinkCursor: boolean;
@@ -330,6 +332,8 @@ export function createDefaultData(): SiteData {
       disableRightClick: false,
       disableSelection: false,
       effects: {
+        reducedMotion: false,
+        easterEggs: true,
         background: true,
         scanlines: false,
         blinkCursor: true,
