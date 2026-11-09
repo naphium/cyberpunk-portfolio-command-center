@@ -17,6 +17,8 @@ export function EasterEggs({ data, active }: { data: SiteData; active: string })
   const [score, setScore] = useState(0);
   const [notes, setNotes] = useState(false);
   const [coffee, setCoffee] = useState(false);
+  const coffeeRef = useRef(false);
+  coffeeRef.current = coffee;
   const [gravity, setGravity] = useState(false);
   const stopGravity = useRef<(() => void) | null>(null);
   const audio = useAudio();
@@ -67,7 +69,7 @@ export function EasterEggs({ data, active }: { data: SiteData; active: string })
       toast.success("Coffee added: Energy boosted +100%");
     };
     const click = () => {
-      if (coffee) { boost(); return; }
+      if (coffeeRef.current) { boost(); return; }
       const result = avatarCombo(clicks, performance.now()); clicks = result.times;
       if (!result.triggered || !avatar) return;
       avatar.classList.remove("avatar-party");
@@ -97,7 +99,7 @@ export function EasterEggs({ data, active }: { data: SiteData; active: string })
       title?.removeEventListener("pointerleave", cancel); title?.removeEventListener("blur", cancel);
       window.removeEventListener("pointerup", cancel); window.removeEventListener("pointercancel", cancel); window.removeEventListener("keyup", cancel);
     };
-  }, [coffee]);
+  }, []);
 
   useEffect(() => {
     if (!fx.consoleBanner) return;
