@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { SiteData, TabConfig } from "@/lib/content";
+import { eggOutput } from "@/lib/easter-eggs";
 
 interface Line {
   kind: "in" | "out" | "err" | "ok";
@@ -139,6 +140,7 @@ export function Terminal({ open, onClose, data, tabs, onTab, onTheme, onMatrix }
       case "exit":
         return onClose();
       default:
+        { const egg = eggOutput(name.toLowerCase(), p.handle); if (egg !== null) return print(...egg.split("\n").map(out)); }
         return print({ kind: "err", text: `command not found: ${name}. try 'help'` });
     }
   };
